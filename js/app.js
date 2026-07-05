@@ -3,7 +3,8 @@ const PROFILE = {
   name: "Денис",
   enlistment: "2026-06-29",
   oath: "2026-07-25",
-  discharge: "2027-06-29"
+  discharge: "2027-06-29",
+  relationship: "06-12"
 };
 
 const BAR_COUNT = 56;
@@ -178,9 +179,9 @@ function daysBetween(from, to) {
   return Math.round((startOfDay(to) - startOfDay(from)) / MS.day);
 }
 
-function isWithinService(date, enlistment, discharge) {
+function isOnTimeline(date, timelineStart, discharge) {
   const day = startOfDay(date);
-  return day >= startOfDay(enlistment) && day <= startOfDay(discharge);
+  return day >= startOfDay(timelineStart) && day <= startOfDay(discharge);
 }
 
 function buildServiceEvents() {
@@ -192,44 +193,60 @@ function buildServiceEvents() {
   const half = Math.floor(totalDays / 2);
   const enlistYear = enlistment.getFullYear();
   const dischargeYear = discharge.getFullYear();
+  const [relMonth, relDay] = PROFILE.relationship.split("-").map(Number);
+  const timelineStart = new Date(enlistYear, relMonth - 1, relDay);
 
   const events = [
-    { title: "Призыв", date: enlistment },
-    { title: "Присяга", date: oath },
-    { title: "Наступление осени", date: new Date(enlistYear, 8, 1) },
-    { title: "300 дней до дембеля", date: addDays(discharge, -300) },
-    { title: "Прошла четверть службы", date: addDays(enlistment, quarter) },
-    { title: "100 дней после призыва", date: addDays(enlistment, 100) },
-    { title: "Наступление зимы", date: new Date(enlistYear, 11, 1) },
-    { title: "200 дней до дембеля", date: addDays(discharge, -200) },
-    { title: "Половина службы", date: addDays(enlistment, half) },
-    { title: `Новый год ${dischargeYear}`, date: new Date(dischargeYear, 0, 1) },
-    { title: "200 дней после призыва", date: addDays(enlistment, 200) },
-    { title: "Наступление весны", date: new Date(dischargeYear, 2, 1) },
-    { title: "100 дней до дембеля", date: addDays(discharge, -100) },
-    { title: "Осталась четверть службы", date: addDays(discharge, -quarter) },
-    { title: "300 дней после призыва", date: addDays(enlistment, 300) },
-    { title: "Наступление лета", date: new Date(dischargeYear, 5, 1) },
-    { title: "Дембель", date: discharge }
+    { title: "Год отношений", date: new Date(enlistYear, relMonth - 1, relDay), priority: 0 },
+    { title: "Призыв", date: enlistment, priority: 0 },
+    { title: "Присяга", date: oath, priority: 0 },
+    { title: "Наступление осени", date: new Date(enlistYear, 8, 1), priority: 0 },
+    { title: "300 дней до дембеля", date: addDays(discharge, -300), priority: 0 },
+    { title: "Прошла четверть службы", date: addDays(enlistment, quarter), priority: 0 },
+    { title: "100 дней после призыва", date: addDays(enlistment, 100), priority: 0 },
+    { title: "Наступление зимы", date: new Date(enlistYear, 11, 1), priority: 0 },
+    { title: "200 дней до дембеля", date: addDays(discharge, -200), priority: 0 },
+    { title: "Половина службы", date: addDays(enlistment, half), priority: 0 },
+    { title: `Новый год ${dischargeYear}`, date: new Date(dischargeYear, 0, 1), priority: 0 },
+    { title: "200 дней после призыва", date: addDays(enlistment, 200), priority: 0 },
+    { title: "Наступление весны", date: new Date(dischargeYear, 2, 1), priority: 0 },
+    { title: "100 дней до дембеля", date: addDays(discharge, -100), priority: 0 },
+    { title: "Осталась четверть службы", date: addDays(discharge, -quarter), priority: 0 },
+    { title: "300 дней после призыва", date: addDays(enlistment, 300), priority: 0 },
+    { title: "Наступление лета", date: new Date(dischargeYear, 5, 1), priority: 0 },
+    { title: "Дембель", date: discharge, priority: 0 }
   ];
+
+  if (dischargeYear > enlistYear) {
+    events.push({
+      title: "Год отношений",
+      date: new Date(dischargeYear, relMonth - 1, relDay),
+      priority: 0
+    });
+  }
 
   for (let year = enlistYear; year <= dischargeYear; year++) {
     for (const h of SERVICE_HOLIDAYS) {
       events.push({
         title: h.title,
-        date: new Date(year, h.month - 1, h.day)
+        date: new Date(year, h.month - 1, h.day),
+        priority: 1
       });
     }
   }
 
   const unique = new Map();
   for (const event of events) {
-    if (!isWithinService(event.date, enlistment, discharge)) continue;
+    if (!isOnTimeline(event.date, timelineStart, discharge)) continue;
     const key = `${startOfDay(event.date).getTime()}-${event.title}`;
     unique.set(key, event);
   }
 
-  return [...unique.values()].sort((a, b) => a.date - b.date);
+  return [...unique.values()].sort((a, b) => {
+    const diff = a.date - b.date;
+    if (diff !== 0) return diff;
+    return (a.priority || 0) - (b.priority || 0);
+  });
 }
 
 function formatDaysLeft(n) {
