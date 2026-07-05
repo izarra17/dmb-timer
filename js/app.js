@@ -6,7 +6,24 @@ const PROFILE = {
   serviceMonths: 12
 };
 
-const BAR_COUNT = 48;
+const BAR_COUNT = 56;
+const MS = {
+  second: 1000,
+  minute: 60 * 1000,
+  hour: 60 * 60 * 1000,
+  day: 24 * 60 * 60 * 1000,
+  week: 7 * 24 * 60 * 60 * 1000,
+  month: 30 * 24 * 60 * 60 * 1000
+};
+
+const UNITS = [
+  { key: "months", one: "месяц", few: "месяца", many: "месяцев", groups: ["md", "mnd"] },
+  { key: "weeks", one: "неделя", few: "недели", many: "недель", groups: ["mnd", "nd"] },
+  { key: "days", one: "день", few: "дня", many: "дней", groups: ["d", "md", "mnd", "nd"] },
+  { key: "hours", one: "час", few: "часа", many: "часов", groups: ["d", "md", "mnd", "nd"] },
+  { key: "minutes", one: "минута", few: "минуты", many: "минут", groups: ["d", "md", "mnd", "nd"] },
+  { key: "seconds", one: "секунда", few: "секунды", many: "секунд", groups: ["d", "md", "mnd", "nd"] }
+];
 
 const MONTHS = [
   "января", "февраля", "марта", "апреля", "мая", "июня",
@@ -14,37 +31,21 @@ const MONTHS = [
 ];
 
 const HOLIDAYS = [
-  { month: 1, day: 25, title: "День российского студенчества" },
   { month: 2, day: 23, title: "День защитника Отечества" },
-  { month: 3, day: 1, title: "Наступление весны" },
-  { month: 3, day: 23, title: "День космонавтики" },
-  { month: 4, day: 15, title: "День специалиста РАВ" },
   { month: 5, day: 9, title: "День Победы" },
-  { month: 5, day: 28, title: "День пограничника" },
-  { month: 6, day: 1, title: "Наступление лета" },
-  { month: 6, day: 12, title: "День России" },
   { month: 7, day: 28, title: "День ВМФ" },
   { month: 8, day: 2, title: "День ВДВ" },
-  { month: 8, day: 12, title: "День ВВС" },
-  { month: 9, day: 1, title: "Наступление осени" },
-  { month: 9, day: 3, title: "День солидарности в борьбе с терроризмом" },
-  { month: 10, day: 20, title: "День военного связиста" },
-  { month: 10, day: 28, title: "День армейской авиации" },
-  { month: 11, day: 5, title: "День военного разведчика" },
   { month: 11, day: 19, title: "День ракетных войск и артиллерии" },
-  { month: 11, day: 27, title: "День морской пехоты" },
   { month: 12, day: 1, title: "Наступление зимы" }
 ];
 
 const els = {
   displayName: document.getElementById("displayName"),
   progressBars: document.getElementById("progressBars"),
-  percent: document.getElementById("percent"),
+  mainValue: document.getElementById("mainValue"),
   secondsLine: document.getElementById("secondsLine"),
-  elapsedDays: document.getElementById("elapsedDays"),
-  elapsedDetail: document.getElementById("elapsedDetail"),
-  remainingDays: document.getElementById("remainingDays"),
-  remainingDetail: document.getElementById("remainingDetail"),
+  elapsedCol: document.getElementById("elapsedCol"),
+  remainingCol: document.getElementById("remainingCol"),
   enlistmentShort: document.getElementById("enlistmentShort"),
   oathShort: document.getElementById("oathShort"),
   dischargeShort: document.getElementById("dischargeShort"),
@@ -53,6 +54,13 @@ const els = {
 };
 
 let privacyMode = false;
+let displayMode = "percent";
+let unitGroup = "mnd";
+let lastElapsed = null;
+let lastRemaining = null;
+let lastRatio = 0;
+let lastElapsedSec = 0;
+let lastTotalSec = 0;
 
 function addMonths(date, months) {
   const d = new Date(date);
@@ -69,22 +77,21 @@ function plural(n, one, few, many) {
   return many;
 }
 
-function formatDuration(ms) {
+function decompose(ms) {
   if (ms < 0) ms = 0;
-  const totalSec = Math.floor(ms / 1000);
-  const hours = Math.floor((totalSec % 86400) / 3600);
-  const minutes = Math.floor((totalSec % 3600) / 60);
-  const seconds = totalSec % 60;
-
-  const h = `${hours} ${plural(hours, "час", "часа", "часов")}`;
-  const m = `${minutes} ${plural(minutes, "минута", "минуты", "минут")}`;
-  const s = `${seconds} ${plural(seconds, "секунда", "секунды", "секунд")}`;
-
-  return `${h}, ${m}, ${s}`;
-}
-
-function formatDays(n) {
-  return `${n} ${plural(n, "день", "дня", "дней")}`;
+  let r = Math.floor(ms);
+  const months = Math.floor(r / MS.month);
+  r -= months * MS.month;
+  const weeks = Math.floor(r / MS.week);
+  r -= weeks * MS.week;
+  const days = Math.floor(r / MS.day);
+  r -= days * MS.day;
+  const hours = Math.floor(r / MS.hour);
+  r -= hours * MS.hour;
+  const minutes = Math.floor(r / MS.minute);
+  r -= minutes * MS.minute;
+  const seconds = Math.floor(r / MS.second);
+  return { months, weeks, days, hours, minutes, seconds };
 }
 
 function formatShortDate(iso) {
@@ -105,9 +112,9 @@ function formatPercent(n) {
 
 function getTodayHoliday() {
   const now = new Date();
-  const m = now.getMonth() + 1;
-  const d = now.getDate();
-  const hit = HOLIDAYS.find((h) => h.month === m && h.day === d);
+  const hit = HOLIDAYS.find(
+    (h) => h.month === now.getMonth() + 1 && h.day === now.getDate()
+  );
   if (hit) return hit.title;
 
   const upcoming = HOLIDAYS.map((h) => {
@@ -117,9 +124,8 @@ function getTodayHoliday() {
     return { ...h, date };
   }).sort((a, b) => a.date - b.date);
 
-  const next = upcoming[0];
-  const daysLeft = Math.ceil((next.date - now) / 86400000);
-  return `через ${daysLeft} ${plural(daysLeft, "день", "дня", "дней")}: ${next.title.toLowerCase()}`;
+  const daysLeft = Math.ceil((upcoming[0].date - now) / 86400000);
+  return `через ${daysLeft} ${plural(daysLeft, "день", "дня", "дней")}: ${upcoming[0].title.toLowerCase()}`;
 }
 
 function buildProgressBars() {
@@ -127,17 +133,54 @@ function buildProgressBars() {
   for (let i = 0; i < BAR_COUNT; i++) {
     const bar = document.createElement("div");
     bar.className = "progress-bar";
-    bar.style.height = `${20 + (i % 5) * 4}px`;
+    bar.style.height = `${14 + (i % 4) * 5}px`;
     els.progressBars.appendChild(bar);
   }
 }
 
 function updateProgressBars(ratio) {
-  const bars = els.progressBars.querySelectorAll(".progress-bar");
   const filled = Math.round(ratio * BAR_COUNT);
-  bars.forEach((bar, i) => {
+  els.progressBars.querySelectorAll(".progress-bar").forEach((bar, i) => {
     bar.classList.toggle("filled", i < filled);
   });
+}
+
+function renderStatColumn(container, data) {
+  container.innerHTML = UNITS.map((u) => {
+    const n = data[u.key];
+    const hidden = !u.groups.includes(unitGroup) ? " hidden" : "";
+    return `<div class="stat-row${hidden}" data-unit="${u.key}">
+      <span class="stat-num">${n}</span>
+      <span class="stat-unit">${plural(n, u.one, u.few, u.many)}</span>
+    </div>`;
+  }).join("");
+}
+
+function updateMainValue() {
+  const elapsed = lastElapsed || decompose(0);
+  const remaining = lastRemaining || decompose(0);
+
+  switch (displayMode) {
+    case "seconds":
+      els.mainValue.textContent = formatNumber(lastElapsedSec);
+      break;
+    case "months":
+      els.mainValue.textContent = String(remaining.months);
+      break;
+    case "hours":
+      els.mainValue.textContent = formatNumber(
+        Math.floor((lastElapsedSec || 0) / 3600)
+      );
+      break;
+    default:
+      els.mainValue.textContent = formatPercent(lastRatio * 100);
+  }
+}
+
+function updateStatsDisplay() {
+  if (lastElapsed) renderStatColumn(els.elapsedCol, lastElapsed);
+  if (lastRemaining) renderStatColumn(els.remainingCol, lastRemaining);
+  updateMainValue();
 }
 
 function tick() {
@@ -148,33 +191,52 @@ function tick() {
   const totalMs = discharge - enlistment;
   const elapsedMs = Math.min(Math.max(now - enlistment, 0), totalMs);
   const remainingMs = Math.max(discharge - now, 0);
-
   const ratio = totalMs > 0 ? elapsedMs / totalMs : 0;
-  const elapsedSec = Math.floor(elapsedMs / 1000);
-  const totalSec = Math.floor(totalMs / 1000);
 
-  els.displayName.textContent = PROFILE.name.toLowerCase();
-  els.percent.textContent = formatPercent(ratio * 100);
+  lastElapsed = decompose(elapsedMs);
+  lastRemaining = decompose(remainingMs);
+  lastRatio = ratio;
+  lastElapsedSec = Math.floor(elapsedMs / 1000);
+  lastTotalSec = Math.floor(totalMs / 1000);
+
+  els.displayName.textContent = PROFILE.name;
   els.secondsLine.textContent =
-    `${formatNumber(elapsedSec)} секунд из ${formatNumber(totalSec)}`;
+    `${formatNumber(lastElapsedSec)} секунд из ${formatNumber(lastTotalSec)}`;
 
-  els.elapsedDays.textContent = formatDays(Math.floor(elapsedMs / 86400000));
-  els.elapsedDetail.textContent = formatDuration(elapsedMs);
-  els.remainingDays.textContent = formatDays(Math.ceil(remainingMs / 86400000));
-  els.remainingDetail.textContent = formatDuration(remainingMs);
+  updateStatsDisplay();
+  updateProgressBars(ratio);
 
   els.enlistmentShort.textContent = formatShortDate(PROFILE.enlistment);
   els.oathShort.textContent = formatShortDate(PROFILE.oath);
   els.dischargeShort.textContent = formatShortDate(
     discharge.toISOString().slice(0, 10)
   );
-
   els.holidayText.textContent = getTodayHoliday();
-  updateProgressBars(ratio);
+}
+
+function initTabs() {
+  document.querySelectorAll(".display-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".display-tab").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      displayMode = btn.dataset.mode;
+      updateMainValue();
+    });
+  });
+
+  document.querySelectorAll(".unit-tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".unit-tab").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      unitGroup = btn.dataset.units;
+      updateStatsDisplay();
+    });
+  });
 }
 
 function init() {
   buildProgressBars();
+  initTabs();
 
   els.btnTogglePrivacy.addEventListener("click", () => {
     privacyMode = !privacyMode;

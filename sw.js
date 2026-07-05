@@ -1,11 +1,12 @@
-const CACHE = "dmb-timer-v3";
+const CACHE = "dmb-timer-v4";
 const ASSETS = [
   "./",
   "./index.html",
   "./css/style.css",
   "./js/app.js",
   "./manifest.json",
-  "./icons/icon.svg"
+  "./icons/icon.svg",
+  "./images/bg.jpg"
 ];
 
 self.addEventListener("install", (e) => {

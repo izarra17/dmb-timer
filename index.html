@@ -3,36 +3,28 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#faf6f2">
+  <meta name="theme-color" content="#1a1a1a">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Денис">
-  <title>(( денис )) дмб</title>
+  <title>Денис — ДМБ</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="collage-bg" aria-hidden="true">
-    <span class="sticker sticker--pink">★</span>
-    <span class="sticker sticker--green">✦</span>
-    <span class="sticker sticker--heart">♥</span>
-    <span class="tape tape--1"></span>
-    <span class="tape tape--2"></span>
-  </div>
+  <div class="bg-photo" aria-hidden="true"></div>
+  <div class="bg-shade" aria-hidden="true"></div>
 
   <header class="header">
     <div class="header-spacer" aria-hidden="true"></div>
-    <div class="header-center">
-      <p class="header-tag">(( таймер ))</p>
-      <h1 class="header-title" id="displayName">денис</h1>
-    </div>
+    <h1 class="header-title" id="displayName">Денис</h1>
     <button type="button" class="icon-btn" id="btnTogglePrivacy" aria-label="Скрыть цифры">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" id="eyeIcon">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
         <circle cx="12" cy="12" r="3"/>
       </svg>
@@ -40,45 +32,55 @@
   </header>
 
   <main class="main">
-    <section class="paper-card progress-section">
-      <p class="section-label">(( прогресс ))</p>
+    <section class="progress-section">
+      <div class="progress-labels">
+        <span>прошло</span>
+        <span>осталось</span>
+      </div>
       <div class="progress-bars" id="progressBars" aria-hidden="true"></div>
-      <p class="percent" id="percent">0,000000%</p>
+
+      <div class="display-tabs" role="tablist">
+        <button type="button" class="display-tab active" data-mode="percent" role="tab">П</button>
+        <button type="button" class="display-tab" data-mode="seconds" role="tab">С</button>
+        <button type="button" class="display-tab" data-mode="months" role="tab">М</button>
+        <button type="button" class="display-tab" data-mode="hours" role="tab">Ч</button>
+      </div>
+
+      <p class="main-value" id="mainValue">0,000000%</p>
       <p class="seconds-line" id="secondsLine">0 секунд из 0</p>
     </section>
 
-    <section class="stats-card paper-card paper-card--tilt">
-      <div class="stats-col">
-        <span class="stats-label">( прошло )</span>
-        <p class="stats-big" id="elapsedDays">—</p>
-        <p class="stats-small" id="elapsedDetail">—</p>
+    <section class="stats-panel">
+      <div class="stats-grid">
+        <div class="stats-col" id="elapsedCol"></div>
+        <div class="stats-col stats-col--right" id="remainingCol"></div>
       </div>
-      <div class="stats-divider"></div>
-      <div class="stats-col">
-        <span class="stats-label">( осталось )</span>
-        <p class="stats-big stats-big--green" id="remainingDays">—</p>
-        <p class="stats-small" id="remainingDetail">—</p>
+
+      <div class="unit-tabs" role="tablist">
+        <button type="button" class="unit-tab" data-units="d" role="tab">Д</button>
+        <button type="button" class="unit-tab" data-units="md" role="tab">МД</button>
+        <button type="button" class="unit-tab active" data-units="mnd" role="tab">МНД</button>
+        <button type="button" class="unit-tab" data-units="nd" role="tab">НД</button>
       </div>
     </section>
 
-    <section class="dates-row dates-row--three">
-      <div class="date-chip paper-card paper-card--mini">
-        <span class="date-chip-label">( призыв )</span>
+    <section class="dates-row">
+      <div class="date-chip">
+        <span class="date-chip-label">призыв</span>
         <span class="date-chip-value" id="enlistmentShort">—</span>
       </div>
-      <div class="date-chip paper-card paper-card--mini paper-card--mint">
-        <span class="date-chip-label">( присяга )</span>
+      <div class="date-chip">
+        <span class="date-chip-label">присяга</span>
         <span class="date-chip-value" id="oathShort">—</span>
       </div>
-      <div class="date-chip paper-card paper-card--mini paper-card--pink">
-        <span class="date-chip-label">(( дембель ))</span>
+      <div class="date-chip date-chip--accent">
+        <span class="date-chip-label">дембель</span>
         <span class="date-chip-value" id="dischargeShort">—</span>
       </div>
     </section>
   </main>
 
-  <footer class="holiday-banner paper-card" id="holidayBanner">
-    <span class="holiday-icon">✦</span>
+  <footer class="holiday-banner" id="holidayBanner">
     <span class="holiday-text" id="holidayText">загрузка…</span>
   </footer>
 
