@@ -1,0 +1,11 @@
+# Служебные файлы Windows
+Thumbs.db
+Desktop.ini
+
+# Редакторы
+.vscode/
+.cursor/
+
+# Временные файлы
+*.log
+*.tmp
