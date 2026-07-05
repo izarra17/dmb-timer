@@ -199,7 +199,7 @@ function tick() {
   lastElapsedSec = Math.floor(elapsedMs / 1000);
   lastTotalSec = Math.floor(totalMs / 1000);
 
-  els.displayName.textContent = PROFILE.name;
+  els.displayName.textContent = PROFILE.name.toLowerCase();
   els.secondsLine.textContent =
     `${formatNumber(lastElapsedSec)} секунд из ${formatNumber(lastTotalSec)}`;
 

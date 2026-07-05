@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#1a1a1a">
+  <meta name="theme-color" content="#faf6f2">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Денис">
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>Денис — ДМБ</title>
+  <title>(( денис )) дмб</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=5">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=6">
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -37,9 +37,12 @@
 
   <header class="header">
     <div class="header-spacer" aria-hidden="true"></div>
-    <h1 class="header-title" id="displayName">Денис</h1>
+    <div class="header-center">
+      <p class="header-tag">(( таймер ))</p>
+      <h1 class="header-title" id="displayName">денис</h1>
+    </div>
     <button type="button" class="icon-btn" id="btnTogglePrivacy" aria-label="Скрыть цифры">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
         <circle cx="12" cy="12" r="3"/>
       </svg>
@@ -49,8 +52,8 @@
   <main class="main">
     <section class="progress-section">
       <div class="progress-labels">
-        <span>прошло</span>
-        <span>осталось</span>
+        <span>( прошло )</span>
+        <span>( осталось )</span>
       </div>
       <div class="progress-bars" id="progressBars" aria-hidden="true"></div>
 
@@ -65,7 +68,10 @@
       <p class="seconds-line" id="secondsLine">0 секунд из 0</p>
     </section>
 
-    <section class="stats-panel">
+    <div class="photo-space" aria-hidden="true"></div>
+
+    <section class="stats-panel paper-card">
+      <p class="section-label">(( служба ))</p>
       <div class="stats-grid">
         <div class="stats-col" id="elapsedCol"></div>
         <div class="stats-col stats-col--right" id="remainingCol"></div>
@@ -80,25 +86,26 @@
     </section>
 
     <section class="dates-row">
-      <div class="date-chip">
-        <span class="date-chip-label">призыв</span>
+      <div class="date-chip paper-card">
+        <span class="date-chip-label">( призыв )</span>
         <span class="date-chip-value" id="enlistmentShort">—</span>
       </div>
-      <div class="date-chip">
-        <span class="date-chip-label">присяга</span>
+      <div class="date-chip paper-card paper-card--mint">
+        <span class="date-chip-label">( присяга )</span>
         <span class="date-chip-value" id="oathShort">—</span>
       </div>
-      <div class="date-chip date-chip--accent">
-        <span class="date-chip-label">дембель</span>
+      <div class="date-chip paper-card paper-card--pink">
+        <span class="date-chip-label">(( дембель ))</span>
         <span class="date-chip-value" id="dischargeShort">—</span>
       </div>
     </section>
   </main>
 
-  <footer class="holiday-banner" id="holidayBanner">
+  <footer class="holiday-banner paper-card" id="holidayBanner">
+    <span class="holiday-icon">✦</span>
     <span class="holiday-text" id="holidayText">загрузка…</span>
   </footer>
 
-  <script src="js/app.js?v=5"></script>
+  <script src="js/app.js?v=6"></script>
 </body>
 </html>
