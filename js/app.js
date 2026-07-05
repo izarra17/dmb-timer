@@ -53,7 +53,7 @@ const els = {
 };
 
 let displayMode = "percent";
-let unitGroup = "mnd";
+let unitGroup = "d";
 let lastElapsed = null;
 let lastRemaining = null;
 let lastRatio = 0;
