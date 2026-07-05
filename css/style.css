@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: "Kom-post";
-  src: url("https://db.onlinewebfonts.com/t/83fb8689ee7e5ca66a2bee194d9dbb5a.woff2") format("woff2");
+  src: url("../fonts/Kom-post.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
