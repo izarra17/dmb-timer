@@ -12,9 +12,10 @@ const MS = {
   minute: 60 * 1000,
   hour: 60 * 60 * 1000,
   day: 24 * 60 * 60 * 1000,
-  week: 7 * 24 * 60 * 60 * 1000,
-  month: 30 * 24 * 60 * 60 * 1000
+  week: 7 * 24 * 60 * 60 * 1000
 };
+
+const BIG_UNITS = new Set(["months", "weeks", "days"]);
 
 const UNITS = [
   { key: "months", one: "месяц", few: "месяца", many: "месяцев", groups: ["md", "mnd"] },
@@ -43,8 +44,7 @@ const els = {
   displayName: document.getElementById("displayName"),
   progressBars: document.getElementById("progressBars"),
   mainValue: document.getElementById("mainValue"),
-  elapsedCol: document.getElementById("elapsedCol"),
-  remainingCol: document.getElementById("remainingCol"),
+  statsRows: document.getElementById("statsRows"),
   enlistmentShort: document.getElementById("enlistmentShort"),
   oathShort: document.getElementById("oathShort"),
   dischargeShort: document.getElementById("dischargeShort"),
@@ -59,8 +59,9 @@ let lastElapsed = null;
 let lastRemaining = null;
 let lastRatio = 0;
 let lastElapsedSec = 0;
-let lastElapsedMs = 0;
-let lastRemainingMs = 0;
+let lastFrom = null;
+let lastTo = null;
+let lastDischarge = null;
 
 function parseLocalDate(iso) {
   return new Date(iso + "T00:00:00");
@@ -75,65 +76,74 @@ function plural(n, one, few, many) {
   return many;
 }
 
-function decompose(ms) {
-  if (ms < 0) ms = 0;
-  let r = Math.floor(ms);
-  const months = Math.floor(r / MS.month);
-  r -= months * MS.month;
-  const weeks = Math.floor(r / MS.week);
-  r -= weeks * MS.week;
-  const days = Math.floor(r / MS.day);
-  r -= days * MS.day;
+function emptyParts() {
+  return { months: 0, weeks: 0, days: 0, hours: 0, minutes: 0, seconds: 0 };
+}
+
+function msToHms(ms) {
+  let r = Math.max(0, Math.floor(ms));
   const hours = Math.floor(r / MS.hour);
   r -= hours * MS.hour;
   const minutes = Math.floor(r / MS.minute);
   r -= minutes * MS.minute;
   const seconds = Math.floor(r / MS.second);
-  return { months, weeks, days, hours, minutes, seconds };
+  return { hours, minutes, seconds };
 }
 
-function decomposeByGroup(ms, group) {
-  if (ms < 0) ms = 0;
-  let r = Math.floor(ms);
+function countCalendarMonths(from, to) {
+  let months = 0;
+  let cursor = new Date(from);
+
+  while (true) {
+    const next = new Date(cursor);
+    next.setMonth(next.getMonth() + 1);
+    if (next.getTime() <= to.getTime()) {
+      months++;
+      cursor = next;
+    } else {
+      break;
+    }
+  }
+
+  return { months, cursor };
+}
+
+function decomposeRange(from, to, group) {
+  if (!from || !to || to <= from) return emptyParts();
+
+  const totalMs = to.getTime() - from.getTime();
 
   if (group === "d") {
-    const days = Math.floor(r / MS.day);
-    r -= days * MS.day;
-    const hours = Math.floor(r / MS.hour);
-    r -= hours * MS.hour;
-    const minutes = Math.floor(r / MS.minute);
-    r -= minutes * MS.minute;
-    const seconds = Math.floor(r / MS.second);
+    const days = Math.floor(totalMs / MS.day);
+    const { hours, minutes, seconds } = msToHms(totalMs - days * MS.day);
     return { months: 0, weeks: 0, days, hours, minutes, seconds };
   }
 
-  if (group === "md") {
-    const months = Math.floor(r / MS.month);
-    r -= months * MS.month;
-    const days = Math.floor(r / MS.day);
-    r -= days * MS.day;
-    const hours = Math.floor(r / MS.hour);
-    r -= hours * MS.hour;
-    const minutes = Math.floor(r / MS.minute);
-    r -= minutes * MS.minute;
-    const seconds = Math.floor(r / MS.second);
-    return { months, weeks: 0, days, hours, minutes, seconds };
-  }
-
   if (group === "nd") {
-    const weeks = Math.floor(r / MS.week);
-    r -= weeks * MS.week;
-    const days = Math.floor(r / MS.day);
-    r -= days * MS.day;
-    const hours = Math.floor(r / MS.hour);
-    r -= hours * MS.hour;
-    const minutes = Math.floor(r / MS.minute);
-    r -= minutes * MS.minute;
-    const seconds = Math.floor(r / MS.second);
+    const weeks = Math.floor(totalMs / MS.week);
+    let rest = totalMs - weeks * MS.week;
+    const days = Math.floor(rest / MS.day);
+    rest -= days * MS.day;
+    const { hours, minutes, seconds } = msToHms(rest);
     return { months: 0, weeks, days, hours, minutes, seconds };
   }
 
-  return decompose(ms);
+  const { months, cursor } = countCalendarMonths(from, to);
+  let rest = to.getTime() - cursor.getTime();
+
+  if (group === "md") {
+    const days = Math.floor(rest / MS.day);
+    rest -= days * MS.day;
+    const { hours, minutes, seconds } = msToHms(rest);
+    return { months, weeks: 0, days, hours, minutes, seconds };
+  }
+
+  const weeks = Math.floor(rest / MS.week);
+  rest -= weeks * MS.week;
+  const days = Math.floor(rest / MS.day);
+  rest -= days * MS.day;
+  const { hours, minutes, seconds } = msToHms(rest);
+  return { months, weeks, days, hours, minutes, seconds };
 }
 
 function formatShortDate(iso) {
@@ -187,13 +197,15 @@ function updateProgressBars(ratio) {
   });
 }
 
-function renderStatColumn(container, data) {
-  container.innerHTML = UNITS.map((u) => {
-    const n = data[u.key];
-    const hidden = !u.groups.includes(unitGroup) ? " hidden" : "";
-    return `<div class="stat-row${hidden}" data-unit="${u.key}">
-      <span class="stat-num">${n}</span>
-      <span class="stat-unit">${plural(n, u.one, u.few, u.many)}</span>
+function renderStatsTable(elapsed, remaining) {
+  els.statsRows.innerHTML = UNITS.map((u) => {
+    if (!u.groups.includes(unitGroup)) return "";
+    const big = BIG_UNITS.has(u.key) ? " stat-row--big" : "";
+    const label = plural(remaining[u.key], u.one, u.few, u.many);
+    return `<div class="stat-row${big}">
+      <span class="stat-num stat-num--left">${elapsed[u.key]}</span>
+      <span class="stat-unit">${label}</span>
+      <span class="stat-num stat-num--right">${remaining[u.key]}</span>
     </div>`;
   }).join("");
 }
@@ -217,10 +229,11 @@ function updateMainValue() {
 }
 
 function updateStatsDisplay() {
-  lastElapsed = decomposeByGroup(lastElapsedMs, unitGroup);
-  lastRemaining = decomposeByGroup(lastRemainingMs, unitGroup);
-  renderStatColumn(els.elapsedCol, lastElapsed);
-  renderStatColumn(els.remainingCol, lastRemaining);
+  if (!lastFrom || !lastTo || !lastDischarge) return;
+
+  lastElapsed = decomposeRange(lastFrom, lastTo, unitGroup);
+  lastRemaining = decomposeRange(lastTo, lastDischarge, unitGroup);
+  renderStatsTable(lastElapsed, lastRemaining);
   updateMainValue();
 }
 
@@ -231,13 +244,13 @@ function tick() {
 
   const totalMs = discharge - enlistment;
   const elapsedMs = Math.min(Math.max(now - enlistment, 0), totalMs);
-  const remainingMs = Math.max(discharge - now, 0);
   const ratio = totalMs > 0 ? elapsedMs / totalMs : 0;
 
+  lastFrom = enlistment;
+  lastTo = now;
+  lastDischarge = discharge;
   lastRatio = ratio;
   lastElapsedSec = Math.floor(elapsedMs / 1000);
-  lastElapsedMs = elapsedMs;
-  lastRemainingMs = remainingMs;
 
   els.displayName.textContent = PROFILE.name.toLowerCase();
 
