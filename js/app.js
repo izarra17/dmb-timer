@@ -31,13 +31,12 @@ const MONTHS = [
   "июля", "августа", "сентября", "октября", "ноября", "декабря"
 ];
 
-const HOLIDAYS = [
+const SERVICE_HOLIDAYS = [
   { month: 2, day: 23, title: "День защитника Отечества" },
   { month: 5, day: 9, title: "День Победы" },
   { month: 7, day: 28, title: "День ВМФ" },
   { month: 8, day: 2, title: "День ВДВ" },
-  { month: 11, day: 19, title: "День ракетных войск и артиллерии" },
-  { month: 12, day: 1, title: "Наступление зимы" }
+  { month: 11, day: 19, title: "День ракетных войск и артиллерии" }
 ];
 
 const els = {
@@ -165,22 +164,103 @@ function formatPercent(n) {
   }) + "%";
 }
 
-function getTodayHoliday() {
-  const now = new Date();
-  const hit = HOLIDAYS.find(
-    (h) => h.month === now.getMonth() + 1 && h.day === now.getDate()
-  );
-  if (hit) return hit.title;
+function addDays(date, days) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
 
-  const upcoming = HOLIDAYS.map((h) => {
-    const year = now.getFullYear();
-    let date = new Date(year, h.month - 1, h.day);
-    if (date < now) date = new Date(year + 1, h.month - 1, h.day);
-    return { ...h, date };
-  }).sort((a, b) => a.date - b.date);
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
 
-  const daysLeft = Math.ceil((upcoming[0].date - now) / MS.day);
-  return `через ${daysLeft} ${plural(daysLeft, "день", "дня", "дней")}: ${upcoming[0].title.toLowerCase()}`;
+function daysBetween(from, to) {
+  return Math.round((startOfDay(to) - startOfDay(from)) / MS.day);
+}
+
+function isWithinService(date, enlistment, discharge) {
+  const day = startOfDay(date);
+  return day >= startOfDay(enlistment) && day <= startOfDay(discharge);
+}
+
+function buildServiceEvents() {
+  const enlistment = parseLocalDate(PROFILE.enlistment);
+  const discharge = parseLocalDate(PROFILE.discharge);
+  const oath = parseLocalDate(PROFILE.oath);
+  const totalDays = daysBetween(enlistment, discharge);
+  const quarter = Math.floor(totalDays / 4);
+  const half = Math.floor(totalDays / 2);
+  const enlistYear = enlistment.getFullYear();
+  const dischargeYear = discharge.getFullYear();
+
+  const events = [
+    { title: "Призыв", date: enlistment },
+    { title: "Присяга", date: oath },
+    { title: "Наступление осени", date: new Date(enlistYear, 8, 1) },
+    { title: "300 дней до дембеля", date: addDays(discharge, -300) },
+    { title: "Прошла четверть службы", date: addDays(enlistment, quarter) },
+    { title: "100 дней после призыва", date: addDays(enlistment, 100) },
+    { title: "Наступление зимы", date: new Date(enlistYear, 11, 1) },
+    { title: "200 дней до дембеля", date: addDays(discharge, -200) },
+    { title: "Половина службы", date: addDays(enlistment, half) },
+    { title: `Новый год ${dischargeYear}`, date: new Date(dischargeYear, 0, 1) },
+    { title: "200 дней после призыва", date: addDays(enlistment, 200) },
+    { title: "Наступление весны", date: new Date(dischargeYear, 2, 1) },
+    { title: "100 дней до дембеля", date: addDays(discharge, -100) },
+    { title: "Осталась четверть службы", date: addDays(discharge, -quarter) },
+    { title: "300 дней после призыва", date: addDays(enlistment, 300) },
+    { title: "Наступление лета", date: new Date(dischargeYear, 5, 1) },
+    { title: "Дембель", date: discharge }
+  ];
+
+  for (let year = enlistYear; year <= dischargeYear; year++) {
+    for (const h of SERVICE_HOLIDAYS) {
+      events.push({
+        title: h.title,
+        date: new Date(year, h.month - 1, h.day)
+      });
+    }
+  }
+
+  const unique = new Map();
+  for (const event of events) {
+    if (!isWithinService(event.date, enlistment, discharge)) continue;
+    const key = `${startOfDay(event.date).getTime()}-${event.title}`;
+    unique.set(key, event);
+  }
+
+  return [...unique.values()].sort((a, b) => a.date - b.date);
+}
+
+function formatDaysLeft(n) {
+  if (n === 1) return "остался 1 день";
+  return `осталось ${n} ${plural(n, "день", "дня", "дней")}`;
+}
+
+function formatDaysPassed(n) {
+  if (n === 1) return "прошёл 1 день";
+  return `прошло ${n} ${plural(n, "день", "дня", "дней")}`;
+}
+
+function getBannerEvent(now) {
+  const events = buildServiceEvents();
+  if (!events.length) return "загрузка…";
+
+  const today = startOfDay(now);
+  const todayEvent = events.find((e) => startOfDay(e.date).getTime() === today.getTime());
+  if (todayEvent) {
+    return todayEvent.title.toLowerCase();
+  }
+
+  const upcoming = events.find((e) => startOfDay(e.date) > today);
+  if (upcoming) {
+    const daysLeft = daysBetween(now, upcoming.date);
+    return `${formatDaysLeft(daysLeft)}: ${upcoming.title.toLowerCase()}`;
+  }
+
+  const last = events[events.length - 1];
+  const daysPassed = daysBetween(last.date, now);
+  return `${formatDaysPassed(daysPassed)}: ${last.title.toLowerCase()}`;
 }
 
 function buildProgressBars() {
@@ -278,7 +358,7 @@ function tick() {
   els.enlistmentShort.textContent = formatShortDate(PROFILE.enlistment);
   els.oathShort.textContent = formatShortDate(PROFILE.oath);
   els.dischargeShort.textContent = formatShortDate(PROFILE.discharge);
-  els.holidayText.textContent = getTodayHoliday();
+  els.holidayText.textContent = getBannerEvent(now);
 }
 
 function initTabs() {

@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: "Denistina";
-  src: url("../fonts/Denistina.ttf?v=22") format("truetype");
+  src: url("../fonts/Denistina.ttf?v=23") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -474,11 +474,12 @@ body {
 
 .holiday-text {
   font-family: var(--font-display);
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.88rem;
+  font-weight: 500;
   letter-spacing: 0.03em;
   text-transform: lowercase;
   line-height: 1.35;
+  text-align: center;
 }
 
 @media (min-width: 480px) {
