@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: "Denistina";
-  src: url("../fonts/Denistina.ttf") format("truetype");
+  src: url("../fonts/Denistina.ttf?v=17") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -96,7 +96,7 @@ body {
 }
 
 .stats-quote {
-  font-family: var(--font-quote);
+  font-family: "Denistina", var(--font-quote);
   font-size: clamp(1.25rem, 4.8vw, 1.55rem);
   line-height: 1.35;
   color: var(--pink-deep);
