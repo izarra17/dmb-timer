@@ -23,8 +23,17 @@
   --overlay-text: #ffffff;
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-body: "Onest", system-ui, sans-serif;
+  --font-quote: "Kom-post", cursive;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+@font-face {
+  font-family: "Kom-post";
+  src: url("https://db.onlinewebfonts.com/t/83fb8689ee7e5ca66a2bee194d9dbb5a.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 html {
@@ -86,18 +95,24 @@ body {
   padding: 0.85rem 1rem 0;
 }
 
+.stats-quote {
+  font-family: var(--font-quote);
+  font-size: clamp(1.25rem, 4.8vw, 1.55rem);
+  line-height: 1.35;
+  color: var(--text);
+  text-align: center;
+  padding: 1rem 1.1rem 0.35rem;
+  letter-spacing: 0.01em;
+}
+
 /* Header — over photo */
 .header {
   position: relative;
   z-index: 2;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 1rem 1.25rem 0.25rem;
-}
-
-.header-spacer {
-  width: 42px;
 }
 
 .header-center {
@@ -122,26 +137,6 @@ body {
   line-height: 1.1;
   color: var(--overlay-text);
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.5);
-}
-
-.icon-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.22);
-  color: var(--overlay-text);
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
-}
-
-.icon-btn:active {
-  background: rgba(255, 255, 255, 0.35);
 }
 
 /* Main layout — table pushed down */
@@ -427,15 +422,6 @@ body {
   letter-spacing: 0.03em;
   text-transform: lowercase;
   line-height: 1.35;
-}
-
-/* Privacy */
-body.privacy .main-value,
-body.privacy .stat-num,
-body.privacy .stat-unit,
-body.privacy .date-chip-value {
-  filter: blur(8px);
-  user-select: none;
 }
 
 @media (min-width: 480px) {

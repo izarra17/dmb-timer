@@ -49,11 +49,9 @@ const els = {
   enlistmentShort: document.getElementById("enlistmentShort"),
   oathShort: document.getElementById("oathShort"),
   dischargeShort: document.getElementById("dischargeShort"),
-  holidayText: document.getElementById("holidayText"),
-  btnTogglePrivacy: document.getElementById("btnTogglePrivacy")
+  holidayText: document.getElementById("holidayText")
 };
 
-let privacyMode = false;
 let displayMode = "percent";
 let unitGroup = "mnd";
 let lastElapsed = null;
@@ -291,11 +289,6 @@ function initTabs() {
 function init() {
   buildProgressBars();
   initTabs();
-
-  els.btnTogglePrivacy.addEventListener("click", () => {
-    privacyMode = !privacyMode;
-    document.body.classList.toggle("privacy", privacyMode);
-  });
 
   tick();
   setInterval(tick, 1000);
