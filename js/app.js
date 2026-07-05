@@ -245,10 +245,6 @@ function init() {
 
   tick();
   setInterval(tick, 1000);
-
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  }
 }
 
 init();
