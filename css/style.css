@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: "Denistina";
-  src: url("../fonts/Denistina.ttf?v=20") format("truetype");
+  src: url("../fonts/Denistina.ttf?v=21") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -223,6 +223,19 @@ body {
   color: #fff;
 }
 
+.main-display {
+  min-height: 4.5rem;
+}
+
+.main-display--unit {
+  text-align: right;
+  padding: 0 0.15rem;
+}
+
+.main-display--unit .main-value {
+  line-height: 1.05;
+}
+
 .main-value {
   font-family: var(--font-display);
   font-size: clamp(2rem, 8vw, 2.55rem);
@@ -232,6 +245,34 @@ body {
   font-variant-numeric: tabular-nums;
   color: var(--overlay-text);
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
+}
+
+.main-unit-line,
+.main-total-line {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.main-unit-line {
+  margin-top: 0.2rem;
+  font-size: clamp(0.95rem, 3.8vw, 1.1rem);
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.25;
+}
+
+.main-total-line {
+  margin-top: 0.1rem;
+  font-size: clamp(1.1rem, 4.5vw, 1.35rem);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.2;
+}
+
+.main-unit-line.hidden,
+.main-total-line.hidden {
+  display: none;
 }
 
 .days-left {

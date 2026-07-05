@@ -44,6 +44,9 @@ const els = {
   displayName: document.getElementById("displayName"),
   progressBars: document.getElementById("progressBars"),
   mainValue: document.getElementById("mainValue"),
+  mainUnitLine: document.getElementById("mainUnitLine"),
+  mainTotalLine: document.getElementById("mainTotalLine"),
+  mainDisplay: document.getElementById("mainDisplay"),
   elapsedCol: document.getElementById("elapsedCol"),
   remainingCol: document.getElementById("remainingCol"),
   enlistmentShort: document.getElementById("enlistmentShort"),
@@ -61,6 +64,7 @@ let lastElapsedSec = 0;
 let lastFrom = null;
 let lastTo = null;
 let lastDischarge = null;
+let lastTotalSec = 0;
 
 function parseLocalDate(iso) {
   return new Date(iso + "T00:00:00");
@@ -214,21 +218,31 @@ function renderStatsTable(elapsed, remaining) {
 }
 
 function updateMainValue() {
-  switch (displayMode) {
-    case "seconds":
-      els.mainValue.textContent = formatNumber(lastElapsedSec);
-      break;
-    case "months":
-      els.mainValue.textContent = String(lastRemaining ? lastRemaining.months : 0);
-      break;
-    case "hours":
-      els.mainValue.textContent = formatNumber(
-        Math.floor((lastElapsedSec || 0) / 3600)
-      );
-      break;
-    default:
-      els.mainValue.textContent = formatPercent(lastRatio * 100);
+  const { mainValue, mainUnitLine, mainTotalLine, mainDisplay } = els;
+
+  if (displayMode === "seconds" || displayMode === "minutes" || displayMode === "hours") {
+    const units = {
+      seconds: { div: 1, one: "секунда", few: "секунды", many: "секунд" },
+      minutes: { div: 60, one: "минута", few: "минуты", many: "минут" },
+      hours: { div: 3600, one: "час", few: "часа", many: "часов" }
+    };
+    const u = units[displayMode];
+    const elapsed = Math.floor(lastElapsedSec / u.div);
+    const total = Math.floor(lastTotalSec / u.div);
+
+    mainDisplay.classList.add("main-display--unit");
+    mainValue.textContent = formatNumber(elapsed);
+    mainUnitLine.textContent = `${plural(elapsed, u.one, u.few, u.many)} из`;
+    mainTotalLine.textContent = formatNumber(total);
+    mainUnitLine.classList.remove("hidden");
+    mainTotalLine.classList.remove("hidden");
+    return;
   }
+
+  mainDisplay.classList.remove("main-display--unit");
+  mainUnitLine.classList.add("hidden");
+  mainTotalLine.classList.add("hidden");
+  mainValue.textContent = formatPercent(lastRatio * 100);
 }
 
 function updateStatsDisplay() {
@@ -254,6 +268,7 @@ function tick() {
   lastDischarge = discharge;
   lastRatio = ratio;
   lastElapsedSec = Math.floor(elapsedMs / 1000);
+  lastTotalSec = Math.floor(totalMs / 1000);
 
   els.displayName.textContent = PROFILE.name.toLowerCase();
 

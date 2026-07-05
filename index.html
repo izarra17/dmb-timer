@@ -17,17 +17,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" href="fonts/Denistina.ttf?v=20" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="fonts/Denistina.ttf?v=21" as="font" type="font/ttf" crossorigin>
   <style>
     @font-face {
       font-family: "Denistina";
-      src: url("fonts/Denistina.ttf?v=20") format("truetype");
+      src: url("fonts/Denistina.ttf?v=21") format("truetype");
       font-weight: normal;
       font-style: normal;
       font-display: swap;
     }
   </style>
-  <link rel="stylesheet" href="css/style.css?v=20">
+  <link rel="stylesheet" href="css/style.css?v=21">
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -63,11 +63,15 @@
       <div class="display-tabs" role="tablist">
         <button type="button" class="display-tab active" data-mode="percent" role="tab">П</button>
         <button type="button" class="display-tab" data-mode="seconds" role="tab">С</button>
-        <button type="button" class="display-tab" data-mode="months" role="tab">М</button>
+        <button type="button" class="display-tab" data-mode="minutes" role="tab">М</button>
         <button type="button" class="display-tab" data-mode="hours" role="tab">Ч</button>
       </div>
 
-      <p class="main-value" id="mainValue">0,00%</p>
+      <div class="main-display" id="mainDisplay">
+        <p class="main-value" id="mainValue">0,00%</p>
+        <p class="main-unit-line hidden" id="mainUnitLine"></p>
+        <p class="main-total-line hidden" id="mainTotalLine"></p>
+      </div>
     </section>
 
     <div class="photo-space" aria-hidden="true"></div>
@@ -97,7 +101,7 @@
         <span class="date-chip-value" id="oathShort">—</span>
       </div>
       <div class="date-chip paper-card paper-card--pink">
-        <span class="date-chip-label">(( дембель ))</span>
+        <span class="date-chip-label">( дембель )</span>
         <span class="date-chip-value" id="dischargeShort">—</span>
       </div>
     </section>
@@ -108,6 +112,6 @@
     <span class="holiday-text" id="holidayText">загрузка…</span>
   </footer>
 
-  <script src="js/app.js?v=20"></script>
+  <script src="js/app.js?v=21"></script>
 </body>
 </html>
