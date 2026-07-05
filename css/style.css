@@ -422,8 +422,6 @@ body {
 
 /* Privacy */
 body.privacy .main-value,
-body.privacy .days-left,
-body.privacy .seconds-line,
 body.privacy .stat-num,
 body.privacy .stat-unit,
 body.privacy .date-chip-value {

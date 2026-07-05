@@ -43,8 +43,6 @@ const els = {
   displayName: document.getElementById("displayName"),
   progressBars: document.getElementById("progressBars"),
   mainValue: document.getElementById("mainValue"),
-  daysLeft: document.getElementById("daysLeft"),
-  secondsLine: document.getElementById("secondsLine"),
   elapsedCol: document.getElementById("elapsedCol"),
   remainingCol: document.getElementById("remainingCol"),
   enlistmentShort: document.getElementById("enlistmentShort"),
@@ -61,8 +59,8 @@ let lastElapsed = null;
 let lastRemaining = null;
 let lastRatio = 0;
 let lastElapsedSec = 0;
-let lastTotalSec = 0;
-let lastDaysLeft = 0;
+let lastElapsedMs = 0;
+let lastRemainingMs = 0;
 
 function parseLocalDate(iso) {
   return new Date(iso + "T00:00:00");
@@ -92,6 +90,50 @@ function decompose(ms) {
   r -= minutes * MS.minute;
   const seconds = Math.floor(r / MS.second);
   return { months, weeks, days, hours, minutes, seconds };
+}
+
+function decomposeByGroup(ms, group) {
+  if (ms < 0) ms = 0;
+  let r = Math.floor(ms);
+
+  if (group === "d") {
+    const days = Math.floor(r / MS.day);
+    r -= days * MS.day;
+    const hours = Math.floor(r / MS.hour);
+    r -= hours * MS.hour;
+    const minutes = Math.floor(r / MS.minute);
+    r -= minutes * MS.minute;
+    const seconds = Math.floor(r / MS.second);
+    return { months: 0, weeks: 0, days, hours, minutes, seconds };
+  }
+
+  if (group === "md") {
+    const months = Math.floor(r / MS.month);
+    r -= months * MS.month;
+    const days = Math.floor(r / MS.day);
+    r -= days * MS.day;
+    const hours = Math.floor(r / MS.hour);
+    r -= hours * MS.hour;
+    const minutes = Math.floor(r / MS.minute);
+    r -= minutes * MS.minute;
+    const seconds = Math.floor(r / MS.second);
+    return { months, weeks: 0, days, hours, minutes, seconds };
+  }
+
+  if (group === "nd") {
+    const weeks = Math.floor(r / MS.week);
+    r -= weeks * MS.week;
+    const days = Math.floor(r / MS.day);
+    r -= days * MS.day;
+    const hours = Math.floor(r / MS.hour);
+    r -= hours * MS.hour;
+    const minutes = Math.floor(r / MS.minute);
+    r -= minutes * MS.minute;
+    const seconds = Math.floor(r / MS.second);
+    return { months: 0, weeks, days, hours, minutes, seconds };
+  }
+
+  return decompose(ms);
 }
 
 function formatShortDate(iso) {
@@ -175,8 +217,10 @@ function updateMainValue() {
 }
 
 function updateStatsDisplay() {
-  if (lastElapsed) renderStatColumn(els.elapsedCol, lastElapsed);
-  if (lastRemaining) renderStatColumn(els.remainingCol, lastRemaining);
+  lastElapsed = decomposeByGroup(lastElapsedMs, unitGroup);
+  lastRemaining = decomposeByGroup(lastRemainingMs, unitGroup);
+  renderStatColumn(els.elapsedCol, lastElapsed);
+  renderStatColumn(els.remainingCol, lastRemaining);
   updateMainValue();
 }
 
@@ -190,18 +234,12 @@ function tick() {
   const remainingMs = Math.max(discharge - now, 0);
   const ratio = totalMs > 0 ? elapsedMs / totalMs : 0;
 
-  lastElapsed = decompose(elapsedMs);
-  lastRemaining = decompose(remainingMs);
   lastRatio = ratio;
   lastElapsedSec = Math.floor(elapsedMs / 1000);
-  lastTotalSec = Math.floor(totalMs / 1000);
-  lastDaysLeft = Math.ceil(remainingMs / MS.day);
+  lastElapsedMs = elapsedMs;
+  lastRemainingMs = remainingMs;
 
   els.displayName.textContent = PROFILE.name.toLowerCase();
-  els.daysLeft.textContent =
-    `осталось ${lastDaysLeft} ${plural(lastDaysLeft, "день", "дня", "дней")}`;
-  els.secondsLine.textContent =
-    `${formatNumber(lastElapsedSec)} секунд из ${formatNumber(lastTotalSec)}`;
 
   updateStatsDisplay();
   updateProgressBars(ratio);
