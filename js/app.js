@@ -4,7 +4,10 @@ const PROFILE = {
   enlistment: "2026-06-29",
   oath: "2026-07-25",
   discharge: "2027-06-29",
-  relationship: "06-12"
+  relationshipYear: "2027-06-12",
+  relationshipHalf: "2026-12-12",
+  denisBirthday: "07-15",
+  veraBirthday: "08-05"
 };
 
 const BAR_COUNT = 56;
@@ -193,19 +196,22 @@ function buildServiceEvents() {
   const half = Math.floor(totalDays / 2);
   const enlistYear = enlistment.getFullYear();
   const dischargeYear = discharge.getFullYear();
-  const [relMonth, relDay] = PROFILE.relationship.split("-").map(Number);
-  const timelineStart = new Date(enlistYear, relMonth - 1, relDay);
+  const timelineStart = enlistment;
+  const [denisMonth, denisDay] = PROFILE.denisBirthday.split("-").map(Number);
+  const [veraMonth, veraDay] = PROFILE.veraBirthday.split("-").map(Number);
 
   const events = [
-    { title: "Год отношений", date: new Date(enlistYear, relMonth - 1, relDay), priority: 0 },
     { title: "Призыв", date: enlistment, priority: 0 },
+    { title: "День рождения Дениса", date: new Date(enlistYear, denisMonth - 1, denisDay), priority: 0 },
     { title: "Присяга", date: oath, priority: 0 },
     { title: "Наступление осени", date: new Date(enlistYear, 8, 1), priority: 0 },
     { title: "300 дней до дембеля", date: addDays(discharge, -300), priority: 0 },
     { title: "Прошла четверть службы", date: addDays(enlistment, quarter), priority: 0 },
     { title: "100 дней после призыва", date: addDays(enlistment, 100), priority: 0 },
+    { title: "День рождения Веры", date: new Date(enlistYear, veraMonth - 1, veraDay), priority: 0 },
     { title: "Наступление зимы", date: new Date(enlistYear, 11, 1), priority: 0 },
     { title: "200 дней до дембеля", date: addDays(discharge, -200), priority: 0 },
+    { title: "Полгода отношений", date: parseLocalDate(PROFILE.relationshipHalf), priority: 0 },
     { title: "Половина службы", date: addDays(enlistment, half), priority: 0 },
     { title: `Новый год ${dischargeYear}`, date: new Date(dischargeYear, 0, 1), priority: 0 },
     { title: "200 дней после призыва", date: addDays(enlistment, 200), priority: 0 },
@@ -214,16 +220,9 @@ function buildServiceEvents() {
     { title: "Осталась четверть службы", date: addDays(discharge, -quarter), priority: 0 },
     { title: "300 дней после призыва", date: addDays(enlistment, 300), priority: 0 },
     { title: "Наступление лета", date: new Date(dischargeYear, 5, 1), priority: 0 },
+    { title: "Год отношений", date: parseLocalDate(PROFILE.relationshipYear), priority: 0 },
     { title: "Дембель", date: discharge, priority: 0 }
   ];
-
-  if (dischargeYear > enlistYear) {
-    events.push({
-      title: "Год отношений",
-      date: new Date(dischargeYear, relMonth - 1, relDay),
-      priority: 0
-    });
-  }
 
   for (let year = enlistYear; year <= dischargeYear; year++) {
     for (const h of SERVICE_HOLIDAYS) {
