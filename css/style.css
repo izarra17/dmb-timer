@@ -45,7 +45,7 @@ body {
 .bg-photo {
   position: fixed;
   inset: 0;
-  background: url("../images/bg.jpg") center 20% / cover no-repeat;
+  background: url("../images/bg.jpg") center 35% / cover no-repeat;
   z-index: 0;
 }
 
