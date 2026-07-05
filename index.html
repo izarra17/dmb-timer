@@ -3,32 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="theme-color" content="#faf6f2">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Дембель">
-  <title>ДМБ Таймер</title>
+  <title>(( дмб )) таймер</title>
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div class="bg-overlay"></div>
+  <div class="collage-bg" aria-hidden="true">
+    <span class="sticker sticker--pink">★</span>
+    <span class="sticker sticker--green">✦</span>
+    <span class="sticker sticker--heart">♥</span>
+    <span class="tape tape--1"></span>
+    <span class="tape tape--2"></span>
+  </div>
 
   <header class="header">
     <button type="button" class="icon-btn" id="btnSettings" aria-label="Настройки">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
         <circle cx="12" cy="12" r="3"/>
         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
       </svg>
     </button>
-    <h1 class="header-title" id="displayName">Солдат</h1>
+    <div class="header-center">
+      <p class="header-tag">(( таймер ))</p>
+      <h1 class="header-title" id="displayName">солдат</h1>
+    </div>
     <button type="button" class="icon-btn" id="btnTogglePrivacy" aria-label="Скрыть цифры">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="eyeIcon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" id="eyeIcon">
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
         <circle cx="12" cy="12" r="3"/>
       </svg>
@@ -36,67 +45,70 @@
   </header>
 
   <main class="main">
-    <section class="progress-section">
+    <section class="paper-card progress-section">
+      <p class="section-label">(( прогресс ))</p>
       <div class="progress-bars" id="progressBars" aria-hidden="true"></div>
       <p class="percent" id="percent">0,000000%</p>
       <p class="seconds-line" id="secondsLine">0 секунд из 0</p>
     </section>
 
-    <section class="stats-card">
+    <section class="stats-card paper-card paper-card--tilt">
       <div class="stats-col">
-        <span class="stats-label">Прошло</span>
+        <span class="stats-label">( прошло )</span>
         <p class="stats-big" id="elapsedDays">—</p>
         <p class="stats-small" id="elapsedDetail">—</p>
       </div>
       <div class="stats-divider"></div>
       <div class="stats-col">
-        <span class="stats-label">Осталось</span>
-        <p class="stats-big" id="remainingDays">—</p>
+        <span class="stats-label">( осталось )</span>
+        <p class="stats-big stats-big--green" id="remainingDays">—</p>
         <p class="stats-small" id="remainingDetail">—</p>
       </div>
     </section>
 
     <section class="dates-row">
-      <div class="date-chip">
-        <span class="date-chip-label">Призыв</span>
+      <div class="date-chip paper-card paper-card--mini">
+        <span class="date-chip-label">( призыв )</span>
         <span class="date-chip-value" id="enlistmentShort">—</span>
       </div>
-      <div class="date-chip date-chip--accent">
-        <span class="date-chip-label">Дембель</span>
+      <div class="date-chip paper-card paper-card--mini paper-card--pink">
+        <span class="date-chip-label">(( дембель ))</span>
         <span class="date-chip-value" id="dischargeShort">—</span>
       </div>
     </section>
   </main>
 
-  <footer class="holiday-banner" id="holidayBanner">
-    <span class="holiday-icon">★</span>
-    <span class="holiday-text" id="holidayText">Загрузка…</span>
+  <footer class="holiday-banner paper-card" id="holidayBanner">
+    <span class="holiday-icon">✦</span>
+    <span class="holiday-text" id="holidayText">загрузка…</span>
   </footer>
 
-  <!-- Настройки -->
   <dialog class="settings-dialog" id="settingsDialog">
-    <form method="dialog" class="settings-form" id="settingsForm">
+    <form method="dialog" class="settings-form paper-card" id="settingsForm">
       <div class="settings-header">
-        <h2>Настройки</h2>
+        <div>
+          <p class="section-label">(( настройки ))</p>
+          <h2>твои данные</h2>
+        </div>
         <button type="button" class="icon-btn" id="btnCloseSettings" aria-label="Закрыть">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M18 6L6 18M6 6l12 12"/>
           </svg>
         </button>
       </div>
 
       <label class="field">
-        <span class="field-label">Имя / фамилия</span>
-        <input type="text" id="inputName" placeholder="Иванов" maxlength="40" autocomplete="name">
+        <span class="field-label">( имя / фамилия )</span>
+        <input type="text" id="inputName" placeholder="иванов" maxlength="40" autocomplete="name">
       </label>
 
       <label class="field">
-        <span class="field-label">Дата призыва</span>
+        <span class="field-label">( дата призыва )</span>
         <input type="date" id="inputEnlistment" required>
       </label>
 
       <fieldset class="field">
-        <span class="field-label">Срок службы</span>
+        <span class="field-label">( срок службы )</span>
         <div class="radio-row">
           <label class="radio-pill">
             <input type="radio" name="serviceMonths" value="12" checked>
@@ -109,7 +121,7 @@
         </div>
       </fieldset>
 
-      <button type="submit" class="btn-primary">Сохранить</button>
+      <button type="submit" class="btn-primary">сохранить ✦</button>
     </form>
   </dialog>
 
