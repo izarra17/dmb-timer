@@ -3,7 +3,7 @@ const PROFILE = {
   name: "Денис",
   enlistment: "2026-06-29",
   oath: "2026-07-25",
-  serviceMonths: 12
+  discharge: "2027-06-29"
 };
 
 const BAR_COUNT = 56;
@@ -43,6 +43,7 @@ const els = {
   displayName: document.getElementById("displayName"),
   progressBars: document.getElementById("progressBars"),
   mainValue: document.getElementById("mainValue"),
+  daysLeft: document.getElementById("daysLeft"),
   secondsLine: document.getElementById("secondsLine"),
   elapsedCol: document.getElementById("elapsedCol"),
   remainingCol: document.getElementById("remainingCol"),
@@ -61,11 +62,10 @@ let lastRemaining = null;
 let lastRatio = 0;
 let lastElapsedSec = 0;
 let lastTotalSec = 0;
+let lastDaysLeft = 0;
 
-function addMonths(date, months) {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + months);
-  return d;
+function parseLocalDate(iso) {
+  return new Date(iso + "T00:00:00");
 }
 
 function plural(n, one, few, many) {
@@ -95,7 +95,7 @@ function decompose(ms) {
 }
 
 function formatShortDate(iso) {
-  const d = new Date(iso + "T12:00:00");
+  const d = parseLocalDate(iso);
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 }
 
@@ -105,8 +105,8 @@ function formatNumber(n) {
 
 function formatPercent(n) {
   return n.toLocaleString("ru-RU", {
-    minimumFractionDigits: 6,
-    maximumFractionDigits: 6
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
   }) + "%";
 }
 
@@ -124,7 +124,7 @@ function getTodayHoliday() {
     return { ...h, date };
   }).sort((a, b) => a.date - b.date);
 
-  const daysLeft = Math.ceil((upcoming[0].date - now) / 86400000);
+  const daysLeft = Math.ceil((upcoming[0].date - now) / MS.day);
   return `через ${daysLeft} ${plural(daysLeft, "день", "дня", "дней")}: ${upcoming[0].title.toLowerCase()}`;
 }
 
@@ -157,15 +157,12 @@ function renderStatColumn(container, data) {
 }
 
 function updateMainValue() {
-  const elapsed = lastElapsed || decompose(0);
-  const remaining = lastRemaining || decompose(0);
-
   switch (displayMode) {
     case "seconds":
       els.mainValue.textContent = formatNumber(lastElapsedSec);
       break;
     case "months":
-      els.mainValue.textContent = String(remaining.months);
+      els.mainValue.textContent = String(lastRemaining ? lastRemaining.months : 0);
       break;
     case "hours":
       els.mainValue.textContent = formatNumber(
@@ -184,8 +181,8 @@ function updateStatsDisplay() {
 }
 
 function tick() {
-  const enlistment = new Date(PROFILE.enlistment + "T00:00:00");
-  const discharge = addMonths(enlistment, PROFILE.serviceMonths);
+  const enlistment = parseLocalDate(PROFILE.enlistment);
+  const discharge = parseLocalDate(PROFILE.discharge);
   const now = new Date();
 
   const totalMs = discharge - enlistment;
@@ -198,8 +195,11 @@ function tick() {
   lastRatio = ratio;
   lastElapsedSec = Math.floor(elapsedMs / 1000);
   lastTotalSec = Math.floor(totalMs / 1000);
+  lastDaysLeft = Math.ceil(remainingMs / MS.day);
 
   els.displayName.textContent = PROFILE.name.toLowerCase();
+  els.daysLeft.textContent =
+    `осталось ${lastDaysLeft} ${plural(lastDaysLeft, "день", "дня", "дней")}`;
   els.secondsLine.textContent =
     `${formatNumber(lastElapsedSec)} секунд из ${formatNumber(lastTotalSec)}`;
 
@@ -208,9 +208,7 @@ function tick() {
 
   els.enlistmentShort.textContent = formatShortDate(PROFILE.enlistment);
   els.oathShort.textContent = formatShortDate(PROFILE.oath);
-  els.dischargeShort.textContent = formatShortDate(
-    discharge.toISOString().slice(0, 10)
-  );
+  els.dischargeShort.textContent = formatShortDate(PROFILE.discharge);
   els.holidayText.textContent = getTodayHoliday();
 }
 

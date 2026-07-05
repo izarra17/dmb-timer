@@ -77,7 +77,7 @@ body {
 
 .section-label {
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 600;
   letter-spacing: 0.05em;
   color: var(--pink-deep);
@@ -106,7 +106,7 @@ body {
 
 .header-tag {
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   color: var(--overlay-text);
   letter-spacing: 0.05em;
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.45);
@@ -115,7 +115,7 @@ body {
 
 .header-title {
   font-family: var(--font-display);
-  font-size: 1.85rem;
+  font-size: 2.05rem;
   font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: lowercase;
@@ -171,7 +171,7 @@ body {
   justify-content: space-between;
   padding: 0 0.25rem 0.45rem;
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: lowercase;
@@ -213,7 +213,7 @@ body {
   background: none;
   color: rgba(255, 255, 255, 0.45);
   font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -227,7 +227,7 @@ body {
 
 .main-value {
   font-family: var(--font-display);
-  font-size: clamp(1.85rem, 7.5vw, 2.35rem);
+  font-size: clamp(2rem, 8vw, 2.55rem);
   font-weight: 700;
   letter-spacing: 0.01em;
   line-height: 1.1;
@@ -236,9 +236,19 @@ body {
   text-shadow: 0 2px 16px rgba(0, 0, 0, 0.45);
 }
 
+.days-left {
+  margin-top: 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 4.5vw, 1.35rem);
+  font-weight: 700;
+  color: var(--overlay-text);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  letter-spacing: 0.02em;
+}
+
 .seconds-line {
-  margin-top: 0.3rem;
-  font-size: 0.72rem;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
   color: rgba(255, 255, 255, 0.75);
   font-variant-numeric: tabular-nums;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
@@ -269,8 +279,8 @@ body {
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.3rem 0;
-  font-size: 0.88rem;
+  padding: 0.32rem 0;
+  font-size: 0.95rem;
   line-height: 1.35;
 }
 
@@ -280,7 +290,7 @@ body {
 
 .stat-num {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.18rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--pink-deep);
@@ -294,7 +304,7 @@ body {
 .stat-unit {
   font-family: var(--font-body);
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   text-align: right;
 }
 
@@ -310,7 +320,7 @@ body {
   background: none;
   color: var(--text-light);
   font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-size: 0.88rem;
   font-weight: 600;
   letter-spacing: 0.06em;
   padding: 0.7rem 0;
@@ -363,7 +373,7 @@ body {
 .date-chip-label {
   display: block;
   font-family: var(--font-display);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: lowercase;
@@ -372,7 +382,7 @@ body {
 }
 
 .date-chip-value {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.35;
 }
@@ -403,7 +413,7 @@ body {
 
 .holiday-text {
   font-family: var(--font-display);
-  font-size: 0.82rem;
+  font-size: 0.92rem;
   font-weight: 600;
   letter-spacing: 0.03em;
   text-transform: lowercase;
@@ -412,6 +422,7 @@ body {
 
 /* Privacy */
 body.privacy .main-value,
+body.privacy .days-left,
 body.privacy .seconds-line,
 body.privacy .stat-num,
 body.privacy .stat-unit,
