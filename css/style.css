@@ -30,7 +30,7 @@
 
 @font-face {
   font-family: "Denistina";
-  src: url("../fonts/Denistina.ttf?v=21") format("truetype");
+  src: url("../fonts/Denistina.ttf?v=22") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -38,6 +38,7 @@
 
 html {
   height: 100%;
+  overscroll-behavior-y: none;
 }
 
 body {
@@ -45,6 +46,7 @@ body {
   font-family: var(--font-body);
   color: var(--text);
   overflow-x: hidden;
+  overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
@@ -53,14 +55,25 @@ body {
 /* Background */
 .bg-photo {
   position: fixed;
-  inset: 0;
-  background: url("../images/bg.jpg") center 35% / cover no-repeat;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
+  object-fit: cover;
+  object-position: center 35%;
   z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .bg-shade {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100svh;
   background: linear-gradient(
     to bottom,
     rgba(0, 0, 0, 0.08) 0%,
@@ -155,10 +168,18 @@ body {
 
 .photo-space {
   flex: 1;
-  min-height: 22vh;
+  min-height: 16vh;
+  max-height: 18vh;
 }
 
-/* Progress — compact, over photo */
+/* Stats panel — lizochek style */
+.stats-panel {
+  border-radius: 20px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin-top: -0.6rem;
+}
+
 .progress-section {
   text-align: center;
   flex-shrink: 0;
@@ -291,13 +312,6 @@ body {
   color: rgba(255, 255, 255, 0.75);
   font-variant-numeric: tabular-nums;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
-}
-
-/* Stats panel — lizochek style */
-.stats-panel {
-  border-radius: 20px;
-  overflow: hidden;
-  flex-shrink: 0;
 }
 
 .stats-grid {
@@ -478,6 +492,7 @@ body {
 
 @media (max-height: 640px) {
   .photo-space {
-    min-height: 12vh;
+    min-height: 10vh;
+    max-height: 12vh;
   }
 }
