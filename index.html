@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=11">
+  <link rel="stylesheet" href="css/style.css?v=12">
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.getRegistrations().then(function (regs) {
@@ -72,10 +72,8 @@
     <section class="stats-panel paper-card">
       <p class="section-label">(( служба ))</p>
       <div class="stats-grid">
-        <div class="stats-col stats-col--head">( прошло )</div>
-        <div class="stats-col stats-col--head stats-col--labels"></div>
-        <div class="stats-col stats-col--head stats-col--right">( осталось )</div>
-        <div class="stats-rows" id="statsRows"></div>
+        <div class="stats-col" id="elapsedCol"></div>
+        <div class="stats-col stats-col--right" id="remainingCol"></div>
       </div>
 
       <div class="unit-tabs" role="tablist">
@@ -107,6 +105,6 @@
     <span class="holiday-text" id="holidayText">загрузка…</span>
   </footer>
 
-  <script src="js/app.js?v=11"></script>
+  <script src="js/app.js?v=12"></script>
 </body>
 </html>

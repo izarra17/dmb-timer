@@ -44,7 +44,8 @@ const els = {
   displayName: document.getElementById("displayName"),
   progressBars: document.getElementById("progressBars"),
   mainValue: document.getElementById("mainValue"),
-  statsRows: document.getElementById("statsRows"),
+  elapsedCol: document.getElementById("elapsedCol"),
+  remainingCol: document.getElementById("remainingCol"),
   enlistmentShort: document.getElementById("enlistmentShort"),
   oathShort: document.getElementById("oathShort"),
   dischargeShort: document.getElementById("dischargeShort"),
@@ -197,17 +198,21 @@ function updateProgressBars(ratio) {
   });
 }
 
-function renderStatsTable(elapsed, remaining) {
-  els.statsRows.innerHTML = UNITS.map((u) => {
-    if (!u.groups.includes(unitGroup)) return "";
+function renderStatColumn(container, data) {
+  container.innerHTML = UNITS.map((u) => {
+    const n = data[u.key];
+    const hidden = !u.groups.includes(unitGroup) ? " hidden" : "";
     const big = BIG_UNITS.has(u.key) ? " stat-row--big" : "";
-    const label = plural(remaining[u.key], u.one, u.few, u.many);
-    return `<div class="stat-row${big}">
-      <span class="stat-num stat-num--left">${elapsed[u.key]}</span>
-      <span class="stat-unit">${label}</span>
-      <span class="stat-num stat-num--right">${remaining[u.key]}</span>
+    return `<div class="stat-row${hidden}${big}" data-unit="${u.key}">
+      <span class="stat-num">${n}</span>
+      <span class="stat-unit">${plural(n, u.one, u.few, u.many)}</span>
     </div>`;
   }).join("");
+}
+
+function renderStatsTable(elapsed, remaining) {
+  renderStatColumn(els.elapsedCol, elapsed);
+  renderStatColumn(els.remainingCol, remaining);
 }
 
 function updateMainValue() {
