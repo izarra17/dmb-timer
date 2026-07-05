@@ -99,7 +99,7 @@ body {
   font-family: var(--font-quote);
   font-size: clamp(1.25rem, 4.8vw, 1.55rem);
   line-height: 1.35;
-  color: var(--text);
+  color: var(--pink-deep);
   text-align: center;
   padding: 1rem 1.1rem 0.35rem;
   letter-spacing: 0.01em;
