@@ -23,14 +23,14 @@
   --overlay-text: #ffffff;
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-body: "Onest", system-ui, sans-serif;
-  --font-quote: "Kom-post", cursive;
+  --font-quote: "Denistina", cursive;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @font-face {
-  font-family: "Kom-post";
-  src: url("../fonts/Kom-post.ttf") format("truetype");
+  font-family: "Denistina";
+  src: url("../fonts/Denistina.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
