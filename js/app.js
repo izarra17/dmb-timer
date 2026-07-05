@@ -1,4 +1,11 @@
-const STORAGE_KEY = "dmb-timer-settings";
+// Данные зашиты — только для Дениса
+const PROFILE = {
+  name: "Денис",
+  enlistment: "2026-06-29",
+  oath: "2026-07-25",
+  serviceMonths: 12
+};
+
 const BAR_COUNT = 48;
 
 const MONTHS = [
@@ -39,41 +46,13 @@ const els = {
   remainingDays: document.getElementById("remainingDays"),
   remainingDetail: document.getElementById("remainingDetail"),
   enlistmentShort: document.getElementById("enlistmentShort"),
+  oathShort: document.getElementById("oathShort"),
   dischargeShort: document.getElementById("dischargeShort"),
   holidayText: document.getElementById("holidayText"),
-  settingsDialog: document.getElementById("settingsDialog"),
-  settingsForm: document.getElementById("settingsForm"),
-  inputName: document.getElementById("inputName"),
-  inputEnlistment: document.getElementById("inputEnlistment"),
-  btnSettings: document.getElementById("btnSettings"),
-  btnCloseSettings: document.getElementById("btnCloseSettings"),
   btnTogglePrivacy: document.getElementById("btnTogglePrivacy")
 };
 
-let settings = loadSettings();
 let privacyMode = false;
-
-function loadSettings() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (_) {}
-  return {
-    name: "Солдат",
-    enlistment: defaultEnlistment(),
-    serviceMonths: 12
-  };
-}
-
-function defaultEnlistment() {
-  const d = new Date();
-  d.setMonth(d.getMonth() - 4);
-  return d.toISOString().slice(0, 10);
-}
-
-function saveSettings() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-}
 
 function addMonths(date, months) {
   const d = new Date(date);
@@ -93,7 +72,6 @@ function plural(n, one, few, many) {
 function formatDuration(ms) {
   if (ms < 0) ms = 0;
   const totalSec = Math.floor(ms / 1000);
-  const days = Math.floor(totalSec / 86400);
   const hours = Math.floor((totalSec % 86400) / 3600);
   const minutes = Math.floor((totalSec % 3600) / 60);
   const seconds = totalSec % 60;
@@ -133,7 +111,7 @@ function getTodayHoliday() {
   if (hit) return hit.title;
 
   const upcoming = HOLIDAYS.map((h) => {
-    let year = now.getFullYear();
+    const year = now.getFullYear();
     let date = new Date(year, h.month - 1, h.day);
     if (date < now) date = new Date(year + 1, h.month - 1, h.day);
     return { ...h, date };
@@ -141,7 +119,7 @@ function getTodayHoliday() {
 
   const next = upcoming[0];
   const daysLeft = Math.ceil((next.date - now) / 86400000);
-  return `Через ${daysLeft} ${plural(daysLeft, "день", "дня", "дней")}: ${next.title}`;
+  return `через ${daysLeft} ${plural(daysLeft, "день", "дня", "дней")}: ${next.title.toLowerCase()}`;
 }
 
 function buildProgressBars() {
@@ -163,8 +141,8 @@ function updateProgressBars(ratio) {
 }
 
 function tick() {
-  const enlistment = new Date(settings.enlistment + "T00:00:00");
-  const discharge = addMonths(enlistment, settings.serviceMonths);
+  const enlistment = new Date(PROFILE.enlistment + "T00:00:00");
+  const discharge = addMonths(enlistment, PROFILE.serviceMonths);
   const now = new Date();
 
   const totalMs = discharge - enlistment;
@@ -172,25 +150,21 @@ function tick() {
   const remainingMs = Math.max(discharge - now, 0);
 
   const ratio = totalMs > 0 ? elapsedMs / totalMs : 0;
-  const percent = ratio * 100;
-
   const elapsedSec = Math.floor(elapsedMs / 1000);
   const totalSec = Math.floor(totalMs / 1000);
 
-  els.displayName.textContent = settings.name || "Солдат";
-  els.percent.textContent = formatPercent(percent);
+  els.displayName.textContent = PROFILE.name.toLowerCase();
+  els.percent.textContent = formatPercent(ratio * 100);
   els.secondsLine.textContent =
     `${formatNumber(elapsedSec)} секунд из ${formatNumber(totalSec)}`;
 
-  const elapsedDays = Math.floor(elapsedMs / 86400000);
-  const remainingDays = Math.ceil(remainingMs / 86400000);
-
-  els.elapsedDays.textContent = formatDays(elapsedDays);
+  els.elapsedDays.textContent = formatDays(Math.floor(elapsedMs / 86400000));
   els.elapsedDetail.textContent = formatDuration(elapsedMs);
-  els.remainingDays.textContent = formatDays(remainingDays);
+  els.remainingDays.textContent = formatDays(Math.ceil(remainingMs / 86400000));
   els.remainingDetail.textContent = formatDuration(remainingMs);
 
-  els.enlistmentShort.textContent = formatShortDate(settings.enlistment);
+  els.enlistmentShort.textContent = formatShortDate(PROFILE.enlistment);
+  els.oathShort.textContent = formatShortDate(PROFILE.oath);
   els.dischargeShort.textContent = formatShortDate(
     discharge.toISOString().slice(0, 10)
   );
@@ -199,50 +173,14 @@ function tick() {
   updateProgressBars(ratio);
 }
 
-function openSettings() {
-  els.inputName.value = settings.name;
-  els.inputEnlistment.value = settings.enlistment;
-  document
-    .querySelectorAll('input[name="serviceMonths"]')
-    .forEach((r) => {
-      r.checked = Number(r.value) === settings.serviceMonths;
-    });
-  els.settingsDialog.showModal();
-}
-
-function initProgressBars() {
+function init() {
   buildProgressBars();
-}
-
-function initEvents() {
-  els.btnSettings.addEventListener("click", openSettings);
-  els.btnCloseSettings.addEventListener("click", () => els.settingsDialog.close());
-
-  els.settingsForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    settings.name = els.inputName.value.trim() || "Солдат";
-    settings.enlistment = els.inputEnlistment.value;
-    settings.serviceMonths = Number(
-      document.querySelector('input[name="serviceMonths"]:checked').value
-    );
-    saveSettings();
-    els.settingsDialog.close();
-    tick();
-  });
 
   els.btnTogglePrivacy.addEventListener("click", () => {
     privacyMode = !privacyMode;
     document.body.classList.toggle("privacy", privacyMode);
   });
 
-  els.settingsDialog.addEventListener("click", (e) => {
-    if (e.target === els.settingsDialog) els.settingsDialog.close();
-  });
-}
-
-function init() {
-  initProgressBars();
-  initEvents();
   tick();
   setInterval(tick, 1000);
 

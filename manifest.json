@@ -1,6 +1,6 @@
 {
   "name": "ДМБ Таймер",
-  "short_name": "Дембель",
+  "short_name": "Денис",
   "description": "Личный таймер до дембеля",
   "start_url": "./index.html",
   "display": "standalone",

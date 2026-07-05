@@ -130,7 +130,11 @@ body {
   margin-bottom: 0.75rem;
 }
 
-/* Header */
+.header-spacer {
+  width: 42px;
+  flex-shrink: 0;
+}
+
 .header {
   position: relative;
   z-index: 1;
@@ -308,6 +312,24 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
 }
+
+.dates-row--three {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.dates-row--three .date-chip-value {
+  font-size: 0.78rem;
+}
+
+.paper-card--mint {
+  background: linear-gradient(145deg, #fffdf9 0%, var(--green-soft) 100%);
+  border-color: rgba(155, 185, 141, 0.3);
+}
+
+.paper-card--mint .date-chip-value {
+  color: var(--green-deep);
+}
+
 
 .date-chip {
   padding: 1rem 0.75rem;
